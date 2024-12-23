@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 
   // Set mandatory initialization classes
   //
-  runManager->SetUserInitialization(new DetectorConstruction());
+  runManager->SetUserInitialization(new B2a::DetectorConstruction());
 
   auto physicsList = new FTFP_BERT;
   physicsList->RegisterPhysics(new G4StepLimiterPhysics());

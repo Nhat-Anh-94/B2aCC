@@ -6,22 +6,33 @@
 #include "G4Material.hh"
 #include "globals.hh"
 
-// Lớp DetectorConstruction kế thừa từ G4VUserDetectorConstruction
-class DetectorConstruction : public G4VUserDetectorConstruction {
-public:
-    DetectorConstruction();  // Constructor
-    virtual ~DetectorConstruction(); // Destructor
+namespace B2a { // Bao namespace nếu cần
 
-    virtual G4VPhysicalVolume* Construct(); // Hàm xây dựng hình học
+    // Lớp DetectorConstruction kế thừa từ G4VUserDetectorConstruction
+    class DetectorConstruction : public G4VUserDetectorConstruction {
+    public:
+        DetectorConstruction();  // Constructor
+        virtual ~DetectorConstruction(); // Destructor
 
-private:
-    void DefineMaterials(); // Hàm định nghĩa vật liệu
+        virtual G4VPhysicalVolume* Construct(); // Hàm xây dựng hình học
 
-    G4Material* fSiMaterial;  // Vật liệu Silicon
-    G4Material* fCZTMaterial; // Vật liệu Cadmium Zinc Telluride
-    G4LogicalVolume* fLogicSi; // Logical Volume của Si
-    G4LogicalVolume* fLogicCZT; // Logical Volume của CZT
-    G4bool fCheckOverlaps; // Cờ kiểm tra chồng lấn
-};
+        // Thêm các hàm getter để truy cập các thuộc tính private (nếu cần)
+        G4LogicalVolume* GetLogicSi() const { return fLogicSi; }
+        G4LogicalVolume* GetLogicCZT() const { return fLogicCZT; }
 
-#endif
+        // Setter (nếu cần thêm logic thiết lập)
+        void SetCheckOverlaps(G4bool value) { fCheckOverlaps = value; }
+
+    private:
+        void DefineMaterials(); // Hàm định nghĩa vật liệu
+
+        G4Material* fSiMaterial;  // Vật liệu Silicon
+        G4Material* fCZTMaterial; // Vật liệu Cadmium Zinc Telluride
+        G4LogicalVolume* fLogicSi; // Logical Volume của Si
+        G4LogicalVolume* fLogicCZT; // Logical Volume của CZT
+        G4bool fCheckOverlaps = true; // Cờ kiểm tra chồng lấn, mặc định là true
+    };
+
+} // namespace B2a
+
+#endif // DETECTOR_CONSTRUCTION_HH
