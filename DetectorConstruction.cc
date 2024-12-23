@@ -17,7 +17,8 @@ namespace B2a {
         fCZTMaterial(nullptr),
         fLogicSi(nullptr),
         fLogicCZT(nullptr),
-        fCheckOverlaps(true) {
+        fCheckOverlaps(true),
+        fMaxStep(1.0 * mm) {  // Giá trị mặc định cho bước tối đa
     }
 
     // Destructor
@@ -100,6 +101,29 @@ namespace B2a {
             fCheckOverlaps);          // Kiểm tra chồng lấn
 
         return worldPV; // Trả về world volume
+    }
+
+    // Hàm setter cho vật liệu mục tiêu (CZT)
+    void DetectorConstruction::SetTargetMaterial(const G4String& materialName) {
+        auto nistManager = G4NistManager::Instance();
+        fCZTMaterial = nistManager->FindOrBuildMaterial(materialName);
+        if (!fCZTMaterial) {
+            G4cerr << "Error: Material " << materialName << " not found!" << G4endl;
+        }
+    }
+
+    // Hàm setter cho vật liệu phòng thí nghiệm (Silicon)
+    void DetectorConstruction::SetChamberMaterial(const G4String& materialName) {
+        auto nistManager = G4NistManager::Instance();
+        fSiMaterial = nistManager->FindOrBuildMaterial(materialName);
+        if (!fSiMaterial) {
+            G4cerr << "Error: Material " << materialName << " not found!" << G4endl;
+        }
+    }
+
+    // Hàm setter cho bước tối đa
+    void DetectorConstruction::SetMaxStep(double maxStep) {
+        fMaxStep = maxStep;
     }
 
 } // namespace B2a
