@@ -20,15 +20,9 @@ namespace B2a { // Bao namespace nếu cần
         G4LogicalVolume* GetLogicSi() const { return fLogicSi; }
         G4LogicalVolume* GetLogicCZT() const { return fLogicCZT; }
 
-        // Setter cho việc cập nhật vật liệu của mục tiêu và phòng thí nghiệm
-        void SetTargetMaterial(const G4String& materialName);
-        void SetChamberMaterial(const G4String& materialName);
-
-        // Setter cho bước tối đa
-        void SetMaxStep(G4double stepMax);
-
-        // Setter cho cờ kiểm tra chồng lấn
+        // Setter (nếu cần thêm logic thiết lập)
         void SetCheckOverlaps(G4bool value) { fCheckOverlaps = value; }
+        void SetMaxStep(G4double maxStep) { fMaxStep = maxStep; } // Setter cho MaxStep
 
     private:
         void DefineMaterials(); // Hàm định nghĩa vật liệu
@@ -39,8 +33,7 @@ namespace B2a { // Bao namespace nếu cần
         G4LogicalVolume* fLogicCZT; // Logical Volume của CZT
         G4bool fCheckOverlaps = true; // Cờ kiểm tra chồng lấn, mặc định là true
 
-        // Thêm biến lưu trữ bước tối đa
-        G4double fStepMax;
+        G4double fMaxStep;  // Biến lưu trữ giá trị bước tối đa
     };
 
 } // namespace B2a

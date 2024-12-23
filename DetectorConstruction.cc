@@ -1,5 +1,4 @@
 ﻿#include "DetectorConstruction.hh"
-
 #include "G4Box.hh"
 #include "G4LogicalVolume.hh"
 #include "G4Material.hh"
@@ -17,8 +16,8 @@ namespace B2a {
         fCZTMaterial(nullptr),
         fLogicSi(nullptr),
         fLogicCZT(nullptr),
-        fCheckOverlaps(true),
-        fMaxStep(1.0 * mm) {  // Giá trị mặc định cho bước tối đa
+        fMaxStep(1.0 * mm),  // Giá trị mặc định cho bước tối đa
+        fCheckOverlaps(true) {
     }
 
     // Destructor
@@ -103,26 +102,8 @@ namespace B2a {
         return worldPV; // Trả về world volume
     }
 
-    // Hàm setter cho vật liệu mục tiêu (CZT)
-    void DetectorConstruction::SetTargetMaterial(const G4String& materialName) {
-        auto nistManager = G4NistManager::Instance();
-        fCZTMaterial = nistManager->FindOrBuildMaterial(materialName);
-        if (!fCZTMaterial) {
-            G4cerr << "Error: Material " << materialName << " not found!" << G4endl;
-        }
-    }
-
-    // Hàm setter cho vật liệu phòng thí nghiệm (Silicon)
-    void DetectorConstruction::SetChamberMaterial(const G4String& materialName) {
-        auto nistManager = G4NistManager::Instance();
-        fSiMaterial = nistManager->FindOrBuildMaterial(materialName);
-        if (!fSiMaterial) {
-            G4cerr << "Error: Material " << materialName << " not found!" << G4endl;
-        }
-    }
-
-    // Hàm setter cho bước tối đa
-    void DetectorConstruction::SetMaxStep(double maxStep) {
+    // Setter cho MaxStep
+    void DetectorConstruction::SetMaxStep(G4double maxStep) {
         fMaxStep = maxStep;
     }
 
