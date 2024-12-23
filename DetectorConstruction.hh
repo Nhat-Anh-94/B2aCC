@@ -1,57 +1,27 @@
-#ifndef B2aDetectorConstruction_h
-#define B2aDetectorConstruction_h 1
+﻿#ifndef DETECTOR_CONSTRUCTION_HH
+#define DETECTOR_CONSTRUCTION_HH
 
 #include "G4VUserDetectorConstruction.hh"
-#include "G4Threading.hh"
-#include "globals.hh"
-#include "G4Material.hh"
 #include "G4LogicalVolume.hh"
-#include "G4PVPlacement.hh"
-#include "G4UserLimits.hh"
-#include "G4VisAttributes.hh"
+#include "G4Material.hh"
+#include "globals.hh"
 
-class G4VPhysicalVolume;
-class G4Material;
-class G4UserLimits;
-class G4GlobalMagFieldMessenger;
-class DetectorMessenger;
+// Lớp DetectorConstruction kế thừa từ G4VUserDetectorConstruction
+class DetectorConstruction : public G4VUserDetectorConstruction {
+public:
+    DetectorConstruction();  // Constructor
+    virtual ~DetectorConstruction(); // Destructor
 
-namespace B2a {
+    virtual G4VPhysicalVolume* Construct(); // Hàm xây dựng hình học
 
-    class DetectorConstruction : public G4VUserDetectorConstruction
-    {
-    public:
-        DetectorConstruction();
-        ~DetectorConstruction() override;
+private:
+    void DefineMaterials(); // Hàm định nghĩa vật liệu
 
-    public:
-        G4VPhysicalVolume* Construct() override;
-        void ConstructSDandField() override;
-
-        // Set methods
-        void SetTargetMaterial(G4String);
-        void SetChamberMaterial(G4String);
-        void SetMaxStep(G4double);
-        void SetCheckOverlaps(G4bool);
-
-    private:
-        void DefineMaterials();
-        G4VPhysicalVolume* DefineVolumes();
-
-        static G4ThreadLocal G4GlobalMagFieldMessenger* fMagFieldMessenger;
-
-        G4LogicalVolume* fLogicSi = nullptr;
-        G4LogicalVolume* fLogicCZT = nullptr;
-
-        G4Material* fSiMaterial = nullptr;
-        G4Material* fCZTMaterial = nullptr;
-
-        G4UserLimits* fStepLimit = nullptr;
-        G4bool fCheckOverlaps = true;
-
-        DetectorMessenger* fMessenger = nullptr;
-    };
-
-}  // namespace B2a
+    G4Material* fSiMaterial;  // Vật liệu Silicon
+    G4Material* fCZTMaterial; // Vật liệu Cadmium Zinc Telluride
+    G4LogicalVolume* fLogicSi; // Logical Volume của Si
+    G4LogicalVolume* fLogicCZT; // Logical Volume của CZT
+    G4bool fCheckOverlaps; // Cờ kiểm tra chồng lấn
+};
 
 #endif
