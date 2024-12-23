@@ -22,7 +22,7 @@ namespace B2a { // Bao namespace nếu cần
 
         // Setter (nếu cần thêm logic thiết lập)
         void SetCheckOverlaps(G4bool value) { fCheckOverlaps = value; }
-        void SetMaxStep(G4double maxStep) { fMaxStep = maxStep; } // Setter cho MaxStep
+        void SetMaxStep(G4double maxStep); // Chỉ khai báo, không định nghĩa
 
     private:
         void DefineMaterials(); // Hàm định nghĩa vật liệu
