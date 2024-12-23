@@ -4,20 +4,19 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "G4Threading.hh"
 #include "globals.hh"
+#include "G4Material.hh"
+#include "G4LogicalVolume.hh"
+#include "G4PVPlacement.hh"
+#include "G4UserLimits.hh"
+#include "G4VisAttributes.hh"
 
 class G4VPhysicalVolume;
-class G4LogicalVolume;
 class G4Material;
 class G4UserLimits;
 class G4GlobalMagFieldMessenger;
+class DetectorMessenger;
 
-namespace B2a
-{
-
-    class DetectorMessenger;
-
-    /// Detector construction class to define materials, geometry
-    /// and global uniform magnetic field.
+namespace B2a {
 
     class DetectorConstruction : public G4VUserDetectorConstruction
     {
@@ -36,35 +35,21 @@ namespace B2a
         void SetCheckOverlaps(G4bool);
 
     private:
-        // methods
         void DefineMaterials();
         G4VPhysicalVolume* DefineVolumes();
 
-        // static data members
         static G4ThreadLocal G4GlobalMagFieldMessenger* fMagFieldMessenger;
-        // magnetic field messenger
-        // data members
-        G4int fNbOfChambers = 0;
 
-        G4LogicalVolume* fLogicTarget = nullptr;  // pointer to the logical Target
-        G4LogicalVolume** fLogicChamber = nullptr;  // pointer to the logical Chamber
+        G4LogicalVolume* fLogicSi = nullptr;
+        G4LogicalVolume* fLogicCZT = nullptr;
 
-        G4Material* fTargetMaterial = nullptr;  // pointer to the target  material
-        G4Material* fChamberMaterial = nullptr;  // pointer to the chamber material
-
-        G4UserLimits* fStepLimit = nullptr;  // pointer to user step limits
-
-        DetectorMessenger* fMessenger = nullptr;  // messenger
-
-        G4bool fCheckOverlaps = true;  // option to activate checking of volumes overlaps
-
-        // materials
         G4Material* fSiMaterial = nullptr;
         G4Material* fCZTMaterial = nullptr;
 
-        // logical volumes
-        G4LogicalVolume* fLogicSi = nullptr;
-        G4LogicalVolume* fLogicCZT = nullptr;
+        G4UserLimits* fStepLimit = nullptr;
+        G4bool fCheckOverlaps = true;
+
+        DetectorMessenger* fMessenger = nullptr;
     };
 
 }  // namespace B2a

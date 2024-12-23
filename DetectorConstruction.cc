@@ -1,13 +1,6 @@
 ﻿#include "DetectorConstruction.hh"
 #include "G4NistManager.hh"
-#include "G4Box.hh"
-#include "G4LogicalVolume.hh"
-#include "G4PVPlacement.hh"
-#include "G4Material.hh"
-#include "G4VisAttributes.hh"
-#include "G4Colour.hh"
-#include "G4UserLimits.hh"
-#include "globals.hh"  // Đảm bảo sử dụng các đơn vị như mm
+#include "CLHEP/Units/SystemOfUnits.h"  // Đảm bảo rằng bạn đã bao gồm thư viện này để sử dụng các đơn vị như mm
 
 void DetectorConstruction::DefineMaterials()
 {
@@ -34,21 +27,21 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
     G4double CZTBoxLength = 10.0 * mm;
 
     // Kích thước của World Volume
-    G4double worldLength = 2 * (CZTBoxLength + SiBoxLength + 50.0 * mm); // Cộng thêm khoảng cách 5 cm
+    G4double worldLength = 2 * (CZTBoxLength + SiBoxLength + 50.0 * mm);
 
     // World Volume
     auto worldS = new G4Box("world", worldLength / 2, worldLength / 2, worldLength / 2);
     auto worldLV = new G4LogicalVolume(worldS, air, "World");
     auto worldPV = new G4PVPlacement(nullptr, G4ThreeVector(), worldLV, "World", nullptr, false, 0, fCheckOverlaps);
 
-    // Khối hộp Si: Điều chỉnh vị trí của Si để có khoảng cách 5 cm so với CZT
-    G4ThreeVector positionSi = G4ThreeVector(0, 0, -(SiBoxLength / 2 + 50.0 * mm + CZTBoxLength / 2)); // 50 mm là 5 cm
+    // Khối hộp Si
+    G4ThreeVector positionSi = G4ThreeVector(0, 0, -(SiBoxLength / 2 + 50.0 * mm + CZTBoxLength / 2));
     auto SiBox = new G4Box("SiBox", SiBoxWidth / 2, SiBoxHeight / 2, SiBoxLength / 2);
     fLogicSi = new G4LogicalVolume(SiBox, fSiMaterial, "SiBox");
     new G4PVPlacement(nullptr, positionSi, fLogicSi, "SiBox", worldLV, false, 0, fCheckOverlaps);
 
-    // Khối hộp CZT: Vị trí của CZT không thay đổi
-    G4ThreeVector positionCZT = G4ThreeVector(0, 0, 0); // CZT vẫn ở vị trí gốc
+    // Khối hộp CZT
+    G4ThreeVector positionCZT = G4ThreeVector(0, 0, 0);
     auto CZTBox = new G4Box("CZTBox", CZTBoxWidth / 2, CZTBoxHeight / 2, CZTBoxLength / 2);
     fLogicCZT = new G4LogicalVolume(CZTBox, fCZTMaterial, "CZTBox");
     new G4PVPlacement(nullptr, positionCZT, fLogicCZT, "CZTBox", worldLV, false, 0, fCheckOverlaps);
@@ -65,6 +58,6 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 }
 
 DetectorConstruction::DetectorConstruction()
-    : fCheckOverlaps(true)  // Khởi tạo fCheckOverlaps
+    : fCheckOverlaps(true)
 {
 }
