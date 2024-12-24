@@ -191,4 +191,14 @@ namespace B2a {
         if (fChamberMaterial != pttoMaterial) {
             if (pttoMaterial) {
                 fChamberMaterial = pttoMaterial;
-                for (G4int copyNo = 0; copyNo <
+                for (G4int copyNo = 0; copyNo < fNbOfChambers; copyNo++) {
+                    fLogicChamber[copyNo]->SetMaterial(fChamberMaterial);
+                }
+                G4cout << "The chamber is made of " << materialName << G4endl;
+            }
+            else {
+                G4cout << "WARNING: Material " << materialName << " not found" << G4endl;
+            }
+        }
+    }
+}
