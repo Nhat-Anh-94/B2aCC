@@ -226,7 +226,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto chamberS1 = new G4Box("Chamber1_solid", halfLength1, halfWidth1, halfHeight1);
 
   fLogicChamber[0] =
-      new G4LogicalVolume(chamberS1, materialSi, "Chamber1_LV", nullptr, nullptr, nullptr);
+      new G4LogicalVolume(chamberS1, materialSi, "Chamber_LV", nullptr, nullptr, nullptr);
 
   fLogicChamber[0]->SetVisAttributes(chamberVisAtt);
 
@@ -249,7 +249,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto chamberS2 = new G4Box("Chamber2_solid", halfLength2, halfWidth2, halfHeight2);
 
   fLogicChamber[1] =
-      new G4LogicalVolume(chamberS2, materialCZT, "Chamber2_LV", nullptr, nullptr, nullptr);
+      new G4LogicalVolume(chamberS2, materialCZT, "Chamber_LV", nullptr, nullptr, nullptr);
 
   fLogicChamber[1]->SetVisAttributes(chamberVisAtt);
 
@@ -298,8 +298,8 @@ void DetectorConstruction::ConstructSDandField()
   G4SDManager::GetSDMpointer()->AddNewDetector(trackerSD);
   // Setting trackerSD to all logical volumes with the same name
   // of "Chamber_LV".
-  SetSensitiveDetector("Chamber1_LV", trackerSD, true);
-  SetSensitiveDetector("Chamber2_LV", trackerSD, true);
+  SetSensitiveDetector("Chamber_LV", trackerSD, true);
+  //SetSensitiveDetector("Chamber2_LV", trackerSD, true);
 
   // Create global magnetic field messenger.
   // Uniform magnetic field is then created automatically if
