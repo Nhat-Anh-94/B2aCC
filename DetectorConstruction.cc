@@ -244,6 +244,21 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
           fCheckOverlaps);  // Kiểm tra chồng lấn
   }
 
+  G4double Sisize = 57.6 * mm;
+  G4double Siheight = 2 * mm;
+
+  // Tạo hình hộp Si
+  G4Box* SiBox = new G4Box("SiBox", SiSize / 2, SiHeight / 2, SiSize / 2);  // (half-lengths)
+
+  // Tạo vật liệu Silicon
+  G4Material* SiMaterial = G4Material::GetMaterial("Silicon");
+
+  // Tạo logical volume từ hình hộp và vật liệu
+  G4LogicalVolume* SiLogical = new G4LogicalVolume(SiBox, SiMaterial, "Chamber_LV", nullptr, nullptr, nullptr);
+
+  // Đặt khối vào trong world volume (vị trí có thể thay đổi)
+  G4PVPlacement* SiPlacement = new G4PVPlacement(0, G4ThreeVector(0, 0, 12*cm), SiLogical, "Chamber_PV",
+      trackerLV, false, 0, fCheckOverlaps);
 
   // Example of User Limits
   //
