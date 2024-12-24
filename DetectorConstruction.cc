@@ -224,9 +224,10 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
       // Tạo hình hộp thay vì hình trụ, chiều dài và chiều rộng = 2 lần bán kính
       G4double halfLength = rmax;  // Chiều dài (half) = bán kính
       G4double halfWidth = rmax;   // Chiều rộng (half) = bán kính
+      G4double halfHeight = 0.5* chamberWidth;
 
       // Tạo hình hộp với chiều dài, chiều rộng và chiều cao
-      auto chamberS = new G4Box("Chamber_solid", halfLength, halfWidth, halfWidth);
+      auto chamberS = new G4Box("Chamber_solid", halfLength, halfWidth, halfHeight);
 
       fLogicChamber[copyNo] =
           new G4LogicalVolume(chamberS, fChamberMaterial, "Chamber_LV", nullptr, nullptr, nullptr);
