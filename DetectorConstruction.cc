@@ -1,4 +1,4 @@
-//
+﻿//
 // ********************************************************************
 // * License and Disclaimer                                           *
 // *                                                                  *
@@ -170,6 +170,100 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 
   G4cout << "Target is " << 2 * targetLength / cm << " cm of " << fTargetMaterial->GetName()
          << G4endl;
+
+  // Tracker
+
+  G4ThreeVector positionTracker = G4ThreeVector(0, 0, 0);
+
+  auto trackerS = new G4Tubs("tracker", 0, trackerSize, trackerSize, 0. * deg, 360. * deg);
+  auto trackerLV = new G4LogicalVolume(trackerS, air, "Tracker", nullptr, nullptr, nullptr);
+  new G4PVPlacement(nullptr,  // no rotation
+                    positionTracker,  // at (x,y,z)
+                    trackerLV,  // its logical volume
+                    "Tracker",  // its name
+                    worldLV,  // its mother  volume
+                    false,  // no boolean operations
+                    0,  // copy number
+                    fCheckOverlaps);  // checking overlaps
+
+  // Visualization attributes
+
+  G4VisAttributes boxVisAtt(G4Colour::White());
+  G4VisAttributes chamberVisAtt(G4Colour::Yellow());
+
+  worldLV->SetVisAttributes(boxVisAtt);
+  fLogicTarget->SetVisAttributes(boxVisAtt);
+  trackerLV->SetVisAttributes(boxVisAtt);
+
+  // Tracker segments
+
+  G4cout << "There are " << fNbOfChambers << " chambers in the tracker region. " << G4endl
+      << "The chambers are " << chamberWidth / cm << " cm of " << fChamberMaterial->GetName()
+      << G4endl << "The distance between chamber is " << chamberSpacing / cm << " cm" << G4endl;
+
+  G4double firstPosition = -trackerSize + chamberSpacing;
+  G4double firstLength = trackerLength / 10;
+  G4double lastLength = trackerLength;
+
+  G4double halfWidth = 0.5 * chamberWidth;
+  G4double rmaxFirst = 0.5 * firstLength;
+
+  G4double rmaxIncr = 0.0;
+  if (fNbOfChambers > 0) {
+      rmaxIncr = 0.5 * (lastLength - firstLength) / (fNbOfChambers - 1);
+      if (chamberSpacing < chamberWidth) {
+          G4Exception("DetectorConstruction::DefineVolumes()", "InvalidSetup", FatalException,
+              "Width>Spacing");
+      }
+  }
+
+  for (G4int copyNo = 0; copyNo < fNbOfChambers; copyNo++) {
+      G4double Zposition = firstPosition + copyNo * chamberSpacing;
+      G4double rmax = rmaxFirst + copyNo * rmaxIncr;
+
+      // Tạo hình hộp thay vì hình trụ, chiều dài và chiều rộng = 2 lần bán kính
+      G4double halfLength = rmax;  // Chiều dài (half) = bán kính
+      G4double halfWidth = rmax;   // Chiều rộng (half) = bán kính
+
+      // Tạo hình hộp với chiều dài, chiều rộng và chiều cao
+      auto chamberS = new G4Box("Chamber_solid", halfLength, halfWidth, halfWidth);
+
+      fLogicChamber[copyNo] =
+          new G4LogicalVolume(chamberS, fChamberMaterial, "Chamber_LV", nullptr, nullptr, nullptr);
+
+      fLogicChamber[copyNo]->SetVisAttributes(chamberVisAtt);
+
+      new G4PVPlacement(nullptr,  // không xoay
+          G4ThreeVector(0, 0, Zposition),  // Vị trí (x, y, z)
+          fLogicChamber[copyNo],  // Logical volume của buồng
+          "Chamber_PV",  // Tên của buồng
+          trackerLV,  // Volume mẹ
+          false,  // Không có phép toán boolean
+          copyNo,  // Số copy
+          fCheckOverlaps);  // Kiểm tra chồng lấn
+  }
+
+
+  // Example of User Limits
+  //
+  // Below is an example of how to set tracking constraints in a given
+  // logical volume
+  //
+  // Sets a max step length in the tracker region, with G4StepLimiter
+
+  G4double maxStep = 0.5 * chamberWidth;
+  fStepLimit = new G4UserLimits(maxStep);
+  trackerLV->SetUserLimits(fStepLimit);
+
+  /// Set additional contraints on the track, with G4UserSpecialCuts
+  ///
+  /// G4double maxLength = 2*trackerLength, maxTime = 0.1*ns, minEkin = 10*MeV;
+  /// trackerLV->SetUserLimits(new G4UserLimits(maxStep,
+  ///                                           maxLength,
+  ///                                           maxTime,
+  ///                                           minEkin));
+
+  // Always return the physical world
 
   return worldPV;
 }
