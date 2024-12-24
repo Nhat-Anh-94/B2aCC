@@ -102,6 +102,9 @@ void DetectorConstruction::DefineMaterials()
   // Xenon gas defined using NIST Manager
   fChamberMaterial = nistManager->FindOrBuildMaterial("G4_Xe");
 
+  //Si
+  fChamberMaterial = nistManager->FindOrBuildMaterial("G4_Si");
+
   // Print materials
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 }
@@ -197,88 +200,66 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 
   // Tracker segments
 
-  G4cout << "There are " << fNbOfChambers << " chambers in the tracker region. " << G4endl
-      << "The chambers are " << chamberWidth / cm << " cm of " << fChamberMaterial->GetName()
-      << G4endl << "The distance between chamber is " << chamberSpacing / cm << " cm" << G4endl;
+  // Tính toán các thông số chung
+  G4double firstPosition = -trackerSize + chamberSpacing; // Vị trí z khối đầu tiên
+  G4double rmaxFirst = 0.5 * trackerLength / 10;         // Bán kính khối đầu tiên
+  G4double rmaxIncr = 0.5 * trackerLength / (fNbOfChambers - 1); // Tăng bán kính giữa các khối
 
-  G4double firstPosition = -trackerSize + chamberSpacing;
-  G4double firstLength = trackerLength / 10;
-  G4double lastLength = trackerLength;
-
-  G4double halfWidth = 0.5 * chamberWidth;
-  G4double rmaxFirst = 0.5 * firstLength;
-
-  G4double rmaxIncr = 0.0;
-  if (fNbOfChambers > 0) {
-      rmaxIncr = 0.5 * (lastLength - firstLength) / (fNbOfChambers - 1);
-      if (chamberSpacing < chamberWidth) {
-          G4Exception("DetectorConstruction::DefineVolumes()", "InvalidSetup", FatalException,
-              "Width>Spacing");
-      }
+  if (chamberSpacing < chamberWidth) {
+      G4Exception("DetectorConstruction::DefineVolumes()", "InvalidSetup", FatalException,
+          "Width>Spacing");
   }
 
-  for (G4int copyNo = 0; copyNo < fNbOfChambers; copyNo++) {
-      G4double Zposition = firstPosition + copyNo * chamberSpacing;
-      G4double rmax = rmaxFirst + copyNo * rmaxIncr;
+  // Tạo vật liệu cho khối 1 và khối 2
+  G4Material* materialSi = G4Material::GetMaterial("G4_Si");  // Vật liệu Silicon
+  G4Material* materialCZT = G4Material::GetMaterial("G4_CADMIUM_TELLURIDE"); // Vật liệu CZT
 
-      // Tạo hình hộp thay vì hình trụ, chiều dài và chiều rộng = 2 lần bán kính
-      G4double halfLength = rmax;  // Chiều dài (half) = bán kính
-      G4double halfWidth = rmax;   // Chiều rộng (half) = bán kính
-      G4double halfHeight = 0.5* chamberWidth;
+  // Tạo khối đầu tiên (Si)
+  G4double Zposition1 = firstPosition; // Vị trí z của khối đầu tiên
+  G4double halfLength1 = rmaxFirst;   // Chiều dài (half) = bán kính
+  G4double halfWidth1 = rmaxFirst;    // Chiều rộng (half) = bán kính
+  G4double halfHeight1 = 0.5 * chamberWidth; // Chiều cao (half)
 
-      // Tạo hình hộp với chiều dài, chiều rộng và chiều cao
-      auto chamberS = new G4Box("Chamber_solid", halfLength, halfWidth, halfHeight);
+  auto chamberS1 = new G4Box("Chamber1_solid", halfLength1, halfWidth1, halfHeight1);
 
-      fLogicChamber[copyNo] =
-          new G4LogicalVolume(chamberS, fChamberMaterial, "Chamber_LV", nullptr, nullptr, nullptr);
+  fLogicChamber[0] =
+      new G4LogicalVolume(chamberS1, materialSi, "Chamber1_LV", nullptr, nullptr, nullptr);
 
-      fLogicChamber[copyNo]->SetVisAttributes(chamberVisAtt);
+  fLogicChamber[0]->SetVisAttributes(chamberVisAtt);
 
-      new G4PVPlacement(nullptr,  // không xoay
-          G4ThreeVector(0, 0, Zposition),  // Vị trí (x, y, z)
-          fLogicChamber[copyNo],  // Logical volume của buồng
-          "Chamber_PV",  // Tên của buồng
-          trackerLV,  // Volume mẹ
-          false,  // Không có phép toán boolean
-          copyNo,  // Số copy
-          fCheckOverlaps);  // Kiểm tra chồng lấn
-  }
+  new G4PVPlacement(nullptr,
+      G4ThreeVector(0, 0, Zposition1),
+      fLogicChamber[0],
+      "Chamber1_PV",
+      trackerLV,
+      false,
+      0,
+      fCheckOverlaps);
 
-  //Si box
-   // Lấy vật liệu Silicon từ NIST
-  G4NistManager* nistManager = G4NistManager::Instance();
-  G4Material* siMaterial = nistManager->FindOrBuildMaterial("G4_Si");
+  // Tạo khối thứ hai (CZT)
+  G4double Zposition2 = firstPosition + chamberSpacing; // Vị trí z của khối thứ hai
+  G4double rmax2 = rmaxFirst + rmaxIncr;                // Bán kính khối thứ hai
+  G4double halfLength2 = rmax2;
+  G4double halfWidth2 = rmax2;
+  G4double halfHeight2 = 0.5 * chamberWidth;
 
-  // Kích thước khối hộp Si (57.6x57.6x2 mm)
-  G4double siWidth = 57.6 * mm;
-  G4double siHeight = 57.6 * mm;
-  G4double siThickness = 2.0 * mm;
+  auto chamberS2 = new G4Box("Chamber2_solid", halfLength2, halfWidth2, halfHeight2);
 
-  // Tạo khối hộp Si
-  auto siS = new G4Box("Si_box",  // Tên khối
-      0.5 * siWidth, 0.5 * siHeight, 0.5 * siThickness);  // Bán kính (half-length)
+  fLogicChamber[1] =
+      new G4LogicalVolume(chamberS2, materialCZT, "Chamber2_LV", nullptr, nullptr, nullptr);
 
-  // Tạo Logical Volume cho Si
-  G4LogicalVolume* logicSi = new G4LogicalVolume(siS,  // Khối hộp
-      siMaterial,  // Vật liệu Si
-      "Si_LV");  // Tên Logical Volume
+  fLogicChamber[1]->SetVisAttributes(chamberVisAtt);
 
-  // Đặt thuộc tính hiển thị
-  G4VisAttributes* visSi = new G4VisAttributes(G4Colour::Grey());
-  logicSi->SetVisAttributes(visSi);
+  new G4PVPlacement(nullptr,
+      G4ThreeVector(0, 0, Zposition2),
+      fLogicChamber[1],
+      "Chamber2_PV",
+      trackerLV,
+      false,
+      1,
+      fCheckOverlaps);
 
-  // Xác định vị trí và đặt khối Si vào thế giới
-  G4ThreeVector positionSi = G4ThreeVector(0, 0, 0);  // Đặt ở vị trí gốc (0, 0, 0)
-  new G4PVPlacement(nullptr,  // Không xoay
-      positionSi,  // Vị trí
-      logicSi,  // Logical Volume
-      "Si_PV",  // Tên Physical Volume
-      worldLV,  // Volume mẹ là World
-      false,  // Không boolean operation
-      0,  // Số bản sao
-      fCheckOverlaps);  // Kiểm tra chồng lấn
 
-  G4cout << "Si box added at position: " << positionSi << G4endl;
   // Example of User Limits
   //
   // Below is an example of how to set tracking constraints in a given
