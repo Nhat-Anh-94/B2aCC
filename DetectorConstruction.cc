@@ -248,7 +248,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   G4double Siheight = 2 * mm;
 
   // Tạo hình hộp Si
-  G4Box* SiBox = new G4Box("SiBox", SiSize / 2, SiHeight / 2, SiSize / 2);  // (half-lengths)
+  G4Box* SiBox = new G4Box("SiBox", Sisize / 2, Sisize / 2, Siheight / 2);  // (half-lengths)
 
   // Tạo vật liệu Silicon
   G4Material* SiMaterial = G4Material::GetMaterial("Silicon");
