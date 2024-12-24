@@ -295,7 +295,8 @@ void DetectorConstruction::ConstructSDandField()
   G4SDManager::GetSDMpointer()->AddNewDetector(trackerSD);
   // Setting trackerSD to all logical volumes with the same name
   // of "Chamber_LV".
-  SetSensitiveDetector("Chamber_LV", trackerSD, true);
+  SetSensitiveDetector("Chamber1_LV", trackerSD, true);
+  SetSensitiveDetector("Chamber2_LV", trackerSD, true);
 
   // Create global magnetic field messenger.
   // Uniform magnetic field is then created automatically if
