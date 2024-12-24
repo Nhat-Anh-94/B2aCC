@@ -337,24 +337,35 @@ void DetectorConstruction::SetTargetMaterial(G4String materialName)
 
 void DetectorConstruction::SetChamberMaterial(G4String materialName)
 {
-  G4NistManager* nistManager = G4NistManager::Instance();
+    G4NistManager* nistManager = G4NistManager::Instance();
 
-  G4Material* pttoMaterial = nistManager->FindOrBuildMaterial(materialName);
+    // Tìm và tạo vật liệu từ tên
+    G4Material* pttoMaterial = nistManager->FindOrBuildMaterial(materialName);
 
-  if (fChamberMaterial != pttoMaterial) {
-    if (pttoMaterial) {
-      fChamberMaterial = pttoMaterial;
-      for (G4int copyNo = 0; copyNo < fNbOfChambers; copyNo++) {
-        if (fLogicChamber[copyNo]) fLogicChamber[copyNo]->SetMaterial(fChamberMaterial);
-      }
-      G4cout << G4endl << "----> The chambers are made of " << materialName << G4endl;
+    if (fChamberMaterial != pttoMaterial) {
+        if (pttoMaterial) {
+            fChamberMaterial = pttoMaterial;  // Cập nhật vật liệu cho buồng mới
+
+            // Cập nhật vật liệu cho từng buồng (nếu chỉ có 2 buồng)
+            if (fLogicChamber[0]) {
+                fLogicChamber[0]->SetMaterial(fChamberMaterial);  // Cập nhật vật liệu cho buồng 1
+            }
+
+            if (fLogicChamber[1]) {
+                fLogicChamber[1]->SetMaterial(fChamberMaterial);  // Cập nhật vật liệu cho buồng 2
+            }
+
+            // Thông báo vật liệu mới
+            G4cout << G4endl << "----> The chambers are now made of " << materialName << G4endl;
+        }
+        else {
+            // Thông báo khi không tìm thấy vật liệu
+            G4cout << G4endl << "-->  WARNING from SetChamberMaterial : " << materialName << " not found"
+                << G4endl;
+        }
     }
-    else {
-      G4cout << G4endl << "-->  WARNING from SetChamberMaterial : " << materialName << " not found"
-             << G4endl;
-    }
-  }
 }
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
