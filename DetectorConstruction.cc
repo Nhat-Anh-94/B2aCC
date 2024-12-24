@@ -105,6 +105,9 @@ void DetectorConstruction::DefineMaterials()
   //Si
   fChamberMaterial = nistManager->FindOrBuildMaterial("G4_Si");
 
+  //CZT
+  fChamberMaterial = nistManager->FindOrBuildMaterial("G4_CADMIUM_TELLURIDE");
+
   // Print materials
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 }
