@@ -256,6 +256,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   // Tạo logical volume từ hình hộp và vật liệu
   G4LogicalVolume* SiLogical = new G4LogicalVolume(SiBox, SiMaterial, "Chamber_LV", nullptr, nullptr, nullptr);
 
+  SiLogical->SetVisAttributes(chamberVisAtt);
+
   // Đặt khối vào trong world volume (vị trí có thể thay đổi)
   G4PVPlacement* SiPlacement = new G4PVPlacement(0, G4ThreeVector(0, 0, 12*cm), SiLogical, "Chamber_PV",
       trackerLV, false, 0, fCheckOverlaps);
